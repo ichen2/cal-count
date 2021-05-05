@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-    var dialogOpen by remember { mutableStateOf(false) }
+    var dialogState by remember { mutableStateOf(DialogState.NONE) }
     Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
         Spacer(Modifier.weight(1f))
         RadialFilledDonut(currentCalories, targetCalories)
@@ -51,53 +51,22 @@ fun MainScreen() {
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            CircleButton(onClick = { dialogOpen = true }, description = "Add food")
+            CircleButton(onClick = { dialogState = DialogState.ADD_FOOD }, description = "Add food")
             Spacer(Modifier.weight(1f))
-            CircleButton(onClick = { setGoal() }, description = "Set goal")
+            CircleButton(onClick = { dialogState = DialogState.SET_GOAL }, description = "Set goal")
         }
-        if (dialogOpen) {
-            var caloriesText by remember { mutableStateOf("") }
-            AlertDialog(
-                onDismissRequest = { dialogOpen = false },
-                title = { Text("Add Food") },
-                confirmButton = {
-                    Button(onClick = {
-                        println("Confirmed")
-                        addCalories(caloriesText.toInt())
-                        dialogOpen = false
-                    }) {
-                        Text("Confirm")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = {
-                        println("Dismissed")
-                        dialogOpen = false
-                    }) {
-                        Text("Dismiss")
-                    }
-                },
-                text = {
-                    Column {
-                        Text("Input calories")
-                        TextField(
-                            value = caloriesText,
-                            onValueChange = { caloriesText = it },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                        )
-                    }
-                }
-            )
+        if (dialogState != DialogState.NONE) {
+            InputDialog(close = { dialogState = DialogState.NONE }, dialogState = dialogState)
         }
     }
 }
 
-fun addCalories(calories: Int) {
+fun addCalories(calories: Float) {
     currentCalories += calories
 }
 
-fun setGoal () {
-    targetCalories = 3000f
+fun setGoal (calories: Float) {
+    targetCalories = calories
 }
 
 @Preview(showBackground = true)

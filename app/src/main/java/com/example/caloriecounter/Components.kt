@@ -1,6 +1,7 @@
 package com.example.caloriecounter
 
 import android.graphics.Typeface
+import android.util.Log
 import android.view.Gravity
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -8,12 +9,13 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,8 +28,15 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
+
+enum class DialogState {
+    NONE,
+    ADD_FOOD,
+    SET_GOAL
+}
 
 // stateful component - acts as a container for internal state
 @Composable
@@ -147,4 +156,43 @@ fun CircleButton(imageResource: Int? = null, onClick: () -> Unit = {}, descripti
             style = MaterialTheme.typography.caption
         )
     }
+}
+
+@Composable
+fun InputDialog(close: () -> Unit, dialogState: DialogState) {
+    var textfieldValue by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = { close() },
+        title = {
+            Text(text =
+                when(dialogState) {
+                    DialogState.ADD_FOOD -> "Add Food"
+                    DialogState.SET_GOAL -> "Set Goal"
+                    DialogState.NONE -> "Error"
+                }
+            )
+        },
+        confirmButton = {
+            Button(onClick = {
+                when(dialogState) {
+                    DialogState.ADD_FOOD -> addCalories(textfieldValue.toFloat())
+                    DialogState.SET_GOAL -> setGoal(textfieldValue.toFloat())
+                    DialogState.NONE -> Log.e("inputDialog", "No dialog state specified")
+                }
+                close()
+            }) {
+                Text("Confirm")
+            }
+        },
+        text = {
+            Column {
+                Text("Input calories")
+                TextField(
+                    value = textfieldValue,
+                    onValueChange = { textfieldValue = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+        }
+    )
 }
