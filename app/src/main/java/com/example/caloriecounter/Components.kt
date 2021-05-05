@@ -20,12 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +39,7 @@ fun RadialFilledDonut(currentCalories: Float = 0f, targetCalories: Float = 2000f
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessVeryLow
         )
-    }) { state ->
+    }, label = "") { state ->
         if (state) currentCalories.toDegrees(targetCalories) else 0f
     }
     RadialFilledDonut(degrees, currentCalories, targetCalories)
@@ -77,18 +74,22 @@ fun RadialFilledDonut(degrees: Float, currentCalories: Float, targetCalories: Fl
                 .clip(CircleShape)
                 .background(MaterialTheme.colors.background)
         )
-        OutlinedText("${currentCalories.roundToInt()}/${targetCalories.roundToInt()}")
+        OutlinedText(
+            text = "${currentCalories.roundToInt()}/${targetCalories.roundToInt()}",
+            primaryColor = MaterialTheme.colors.background,
+            outlineColor = MaterialTheme.colors.onBackground
+        )
     }
 }
 
 @Composable
-fun OutlinedText(text: String) {
+fun OutlinedText(text: String, primaryColor: Color, outlineColor: Color) {
     val textPaintStroke = Paint().asFrameworkPaint().apply {
         isAntiAlias = true
         style = android.graphics.Paint.Style.STROKE
         textSize = MaterialTheme.typography.h1.fontSize.value
-        color = MaterialTheme.colors.onBackground.toArgb()
-        strokeWidth = 30f
+        color = outlineColor.toArgb()
+        strokeWidth = 20f
         strokeJoin = android.graphics.Paint.Join.ROUND
         textAlign = android.graphics.Paint.Align.CENTER
         typeface = Typeface.DEFAULT_BOLD
@@ -98,7 +99,7 @@ fun OutlinedText(text: String) {
         isAntiAlias = true
         style = android.graphics.Paint.Style.FILL
         textSize = MaterialTheme.typography.h1.fontSize.value
-        color = MaterialTheme.colors.background.toArgb()
+        color = primaryColor.toArgb()
         textAlign = android.graphics.Paint.Align.CENTER
         typeface = Typeface.DEFAULT_BOLD
     }
@@ -140,6 +141,10 @@ fun CircleButton(imageResource: Int? = null, onClick: () -> Unit = {}, descripti
                 )
                 .clickable(onClick = onClick)
         )
-        Text(text = description, modifier = Modifier.align(Alignment.Center), style = MaterialTheme.typography.caption)
+        Text(
+            text = description,
+            modifier = Modifier.align(Alignment.Center),
+            style = MaterialTheme.typography.caption
+        )
     }
 }

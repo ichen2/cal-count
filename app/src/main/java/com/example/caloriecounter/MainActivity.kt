@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.caloriecounter.ui.theme.CalorieCounterTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
 
 var currentCalories: Float by mutableStateOf(220f)
 var targetCalories: Float by mutableStateOf(2000f)
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-
+    var dialogOpen by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
         Spacer(Modifier.weight(1f))
         RadialFilledDonut(currentCalories, targetCalories)
@@ -48,19 +49,54 @@ fun MainScreen() {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(20.dp)) {
-            CircleButton(onClick = addFood, description = "Add food")
+                .padding(20.dp)
+        ) {
+            CircleButton(onClick = { dialogOpen = true }, description = "Add food")
             Spacer(Modifier.weight(1f))
-            CircleButton(onClick = setGoal, description = "Set goal")
+            CircleButton(onClick = { setGoal() }, description = "Set goal")
+        }
+        if (dialogOpen) {
+            var caloriesText by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = { dialogOpen = false },
+                title = { Text("Add Food") },
+                confirmButton = {
+                    Button(onClick = {
+                        println("Confirmed")
+                        addCalories(caloriesText.toInt())
+                        dialogOpen = false
+                    }) {
+                        Text("Confirm")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        println("Dismissed")
+                        dialogOpen = false
+                    }) {
+                        Text("Dismiss")
+                    }
+                },
+                text = {
+                    Column {
+                        Text("Input calories")
+                        TextField(
+                            value = caloriesText,
+                            onValueChange = { caloriesText = it },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+                }
+            )
         }
     }
 }
 
-val addFood: () -> Unit = {
-    currentCalories += 100f
+fun addCalories(calories: Int) {
+    currentCalories += calories
 }
 
-val setGoal: () -> Unit = {
+fun setGoal () {
     targetCalories = 3000f
 }
 
