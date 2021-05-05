@@ -160,6 +160,10 @@ fun CircleButton(imageResource: Int? = null, onClick: () -> Unit = {}, descripti
 
 @Composable
 fun InputDialog(close: () -> Unit, dialogState: DialogState) {
+    if(dialogState == DialogState.NONE) {
+        Log.e("inputDialog", "No dialog state specified")
+        return
+    }
     var textfieldValue by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = { close() },
@@ -168,7 +172,7 @@ fun InputDialog(close: () -> Unit, dialogState: DialogState) {
                 when(dialogState) {
                     DialogState.ADD_FOOD -> "Add Food"
                     DialogState.SET_GOAL -> "Set Goal"
-                    DialogState.NONE -> "Error"
+                    else -> ""
                 }
             )
         },
@@ -177,7 +181,7 @@ fun InputDialog(close: () -> Unit, dialogState: DialogState) {
                 when(dialogState) {
                     DialogState.ADD_FOOD -> addCalories(textfieldValue.toFloat())
                     DialogState.SET_GOAL -> setGoal(textfieldValue.toFloat())
-                    DialogState.NONE -> Log.e("inputDialog", "No dialog state specified")
+                    else -> ""
                 }
                 close()
             }) {
