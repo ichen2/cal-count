@@ -5,41 +5,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.caloriecounter.ui.theme.CalorieCounterTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardType
-import android.preference.PreferenceManager
-
-import android.content.SharedPreferences
-
-
+import java.lang.String.format
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
 
-    private val model: MainViewModel by viewModels( )
+    private val model: MainViewModel by viewModels()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val preferences = getPreferences(Context.MODE_PRIVATE)
         model.setCalories(preferences.getFloat("currentCalories", 0f))
         model.setGoal(preferences.getFloat("targetCalories", 2000f))
+        val previousDate = dateFormat.parse(preferences.getString("previousDate", dateFormat.format(Calendar.getInstance().time)))
+        //if(previousDate.time - Calendar.getInstance().time.time >= TimeUnit.DAYS.toMillis(1))
         setContent {
             CalorieCounterTheme {
                 // A surface container using the 'background' color from the theme
@@ -60,6 +52,7 @@ class MainActivity : ComponentActivity() {
         with (sharedPref.edit()) {
             putFloat("currentCalories", model.getCalories())
             putFloat("targetCalories", model.getGoal())
+            putString("previousData", dateFormat.format(Calendar.getInstance().time))
             apply()
         }
     }
