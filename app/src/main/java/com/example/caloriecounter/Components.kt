@@ -45,11 +45,11 @@ fun RadialFilledDonut(currentCalories: Float = 0f, targetCalories: Float = 2000f
     val transition = updateTransition(animated)
     val degrees by transition.animateFloat(transitionSpec = {
         spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
+            dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessVeryLow
         )
     }, label = "") { state ->
-        if (state) currentCalories.toDegrees(targetCalories) else 0f
+        if (state) Math.min(currentCalories.toDegrees(targetCalories), 360f) else 0f
     }
     RadialFilledDonut(degrees, currentCalories, targetCalories)
     animated = true
@@ -60,7 +60,7 @@ fun RadialFilledDonut(currentCalories: Float = 0f, targetCalories: Float = 2000f
 fun RadialFilledDonut(degrees: Float, currentCalories: Float, targetCalories: Float) {
 
     val RadialFillShape = GenericShape { size, _ ->
-        arcTo(Rect(Offset(0f, 0f), size), -90f, degrees, false)
+        addArc(Rect(Offset(0f, 0f), size), -90f, degrees)
         lineTo(size.width / 2f, size.height / 2f)
         close()
     }
