@@ -1,5 +1,6 @@
 package com.example.caloriecounter
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,11 +24,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
+import android.preference.PreferenceManager
+
+import android.content.SharedPreferences
+
+
+
 
 class MainActivity : ComponentActivity() {
+
+    private val model: MainViewModel by viewModels( )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val model: MainViewModel by viewModels()
+        val preferences = getPreferences(Context.MODE_PRIVATE)
+        model.setCalories(preferences.getFloat("currentCalories", 0f))
+        model.setGoal(preferences.getFloat("targetCalories", 2000f))
         setContent {
             CalorieCounterTheme {
                 // A surface container using the 'background' color from the theme
@@ -35,6 +47,20 @@ class MainActivity : ComponentActivity() {
                     MainScreen(model)
                 }
             }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveData()
+    }
+
+    fun saveData() {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putFloat("currentCalories", model.getCalories())
+            putFloat("targetCalories", model.getGoal())
+            apply()
         }
     }
 }
