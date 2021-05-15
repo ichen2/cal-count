@@ -61,8 +61,10 @@ fun MainScreen(model: MainViewModel) {
     val targetCalories by model.targetCaloriesData.observeAsState(0f)
     Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
         Spacer(Modifier.weight(1f))
-        RadialFilledDonut(currentCalories, targetCalories)
-        Spacer(Modifier.weight(3f))
+        FilledComponent(FilledComponentType.DONUT, currentCalories, targetCalories)
+        Spacer(Modifier.weight(1f))
+        FilledComponent(FilledComponentType.BAR, 300f, 500f)
+        Spacer(Modifier.weight(2f))
         Row(
             Modifier
                 .fillMaxWidth()
