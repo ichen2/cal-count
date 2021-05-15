@@ -6,19 +6,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.caloriecounter.ui.theme.CalorieCounterTheme
-import java.lang.String.format
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
-
 
 class MainActivity : ComponentActivity() {
 
@@ -28,13 +25,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val preferences = getPreferences(Context.MODE_PRIVATE)
-        model.setCalories(preferences.getFloat("currentCalories", 0f))
+        val previousDate = dateFormat.parse(preferences.getString("previousDate", dateFormat.format(Calendar.getInstance().time))!!)
+        val currentDate = Calendar.getInstance().time
+        model.setCalories(if (previousDate.day != currentDate.day || previousDate.month != currentDate.month || previousDate.year != currentDate.year) 0f else preferences.getFloat("currentCalories", 0f))
         model.setGoal(preferences.getFloat("targetCalories", 2000f))
-        val previousDate = dateFormat.parse(preferences.getString("previousDate", dateFormat.format(Calendar.getInstance().time)))
-        //if(previousDate.time - Calendar.getInstance().time.time >= TimeUnit.DAYS.toMillis(1))
         setContent {
             CalorieCounterTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     MainScreen(model)
                 }
